@@ -1,0 +1,93 @@
+/* some style */
+:root {
+  --base03: #002b36;
+  --base02: #073642;
+  --base01: #586e75;
+  --base00: #657b83;
+  --base0: #839496;
+  --base1: #93a1a1;
+  --base2: #eee8d5;
+  --base3: #fdf6e3;
+  --yellow: #b58900;
+  --orange: #cb4b16;
+  --red: #dc322f;
+  --magenta: #d33682;
+  --violet: #6c71c4;
+  --blue: #268bd2;
+  --cyan: #2aa198;
+  --green: #859900;
+}
+
+html,
+body * {
+  color-profile: sRGB;
+  rendering-intent: auto;
+}
+
+body {
+  /* font-family: Helvetica, Arial, sans-serif; */
+  /* font-weight: 300; */
+  font-family: "Fira Code";
+  font-weight: 300;
+
+  background-color: var(--base3);
+  color: var(--base00);
+  * {
+    color: var(--base00);
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--base01);
+    border-color: var(--base00);
+  }
+  a,
+  a:active,
+  a:visited {
+    color: var(--base1);
+  }
+}
+
+h1 {
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: 300;
+}
+
+input {
+  color: var(--base0);
+  background-color: var(--base2);
+  border: 0pt;
+  font-family: "Fira Code";
+  font-weight: 300;
+  width: 100%;
+}
+
+textarea:focus, input:focus{
+  outline: solid;
+  outline-width: thin;
+  outline-color: var(--base0);
+}
+
+
+.term {
+  display: fixed;
+  background-color: var(--base2);
+  color: var(--base0);
+  width: clamp(400px, 60vw, 1000px);
+  margin: auto;
+}
+
+.term-history, .term-history-line,
+.term-duplicate-input
+{
+  margin: 0em;
+}
+
+.term-input-wrapper {
+  width: 100%;
+  display: flex;
+}
+
