@@ -107,3 +107,28 @@
                          (if (= 13 (.-charCode e))
                            (println "ENTER")
                            (println "NOT ENTER")))
+
+
+    ;; <svg id="svg1" style="margin: 0 auto; display: block;"></svg>
+    ;;
+(defn d3-simple-example [example-data root-selection]
+  (let [div-id (keyword (str "div" root-selection))]
+    (r/create-class
+     {:reagent-render
+      (fn [] (let [v (:bar-data @example-data)] [div-id]))
+      :component-did-mount (fn [] (d3-horizontal-bars example-data root-selection))
+      :component-did-update (fn [] (d3-horizontal-bars example-data root-selection))})))
+
+(defonce example-1-data
+  (r/atom
+   {:bar-data
+    [{:key 1, :value 73}
+     {:key 2, :value 48}
+     {:key 3, :value 66}
+     {:key 4, :value 68}
+     {:key 5, :value 62}]}))
+
+
+(defn example-1 []
+  [:div
+   [d3-simple-example example-1-data "#d3-example-1"]])

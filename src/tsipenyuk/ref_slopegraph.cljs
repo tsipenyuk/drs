@@ -1,9 +1,8 @@
-(ns ^:figwheel-hooks tsipenyuk.drs
+(ns tsipenyuk.ref-slopegraph
   (:require
    [goog.dom :as gdom]
    [reagent.core :as r]
    [reagent.dom :as rdom]
-   [tsipenyuk.solarized :as ts]
    [clojure.string :as str]
    [cljsjs.d3 :as d3]))
 
@@ -12,11 +11,7 @@
   (r/atom
    {:mode "drs>"
     :input "Input command here"
-    :history ["New session has started." "Awaiting instructions..."]
-    :xmin -10
-    :xmax 10
-    :ymid 0
-    }))
+    :history ["New session has started." "Awaiting instructions..."]}))
 
 (defn get-app-element [] (gdom/getElement "app"))
 
@@ -95,22 +90,6 @@
 
 (def height 450)
 (def width 540)
-(defn ymax []
-  (let [delta-x (- (:xmax @term) (:xmin @term))]
-    (/ (* delta-x height) (* 2 width))
-    ))
-(defn ymin []
-  (- 0 (ymax)))
-
-(defn scale-x [x]
-  (* width (/ (- x (:xmin @term)) (- (:xmax @term) (:xmin @term)))))
-
-(defn scale-y [y]
-   (* height (/ (- y (ymin)) (- (ymax) (ymin)))))
-
-(defn scale-number [x]
-  (* width (/ x (- (:xmax @term) (:xmin @term)))))
-
 
 (def data {2005 {:natural-gas 0.2008611514256557
                  :coal        0.48970650816857986
@@ -123,8 +102,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helpers
-
-(def scale [])
 
 (def height-scale
   (-> js/d3
@@ -200,19 +177,6 @@
               "y2" (fn [[k _]]
                      (height-scale (get data-col-2 k)))})))
 
-(defn draw-circle [svg]
-  (-> svg
-    (.append "circle")
-    (attrs {
-            "cx" (scale-x 0)
-            "cy" (scale-y 0)
-            "r" (scale-number 1)
-            "stroke" "black"
-            "fill" (:orange ts/solarized)
-            })
-    ))
-
-
 (defn draw-slopegraph [svg data]
   (let [data-2005 (get data 2005)
         data-2015 (get data 2015)]
@@ -221,9 +185,7 @@
     (draw-column svg data-2015 2 {"x" column-space})
 
     (draw-header svg [2005 2015])
-    (draw-line svg data-2005 data-2015)
-    (draw-circle svg)
-    ))
+    (draw-line svg data-2005 data-2015)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
