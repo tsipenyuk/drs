@@ -16,8 +16,10 @@
 ;; state
 ;;
 (def main-fig-static-props
-  {:height 450
-   :width 540})
+  {:height 600
+   :width 800})
+
+(print-something (str "0 0 " (:height main-fig-static-props) " " (:width main-fig-static-props)))
 
 (defonce term
   (r/atom
@@ -174,11 +176,18 @@
 
 
 (defn append-svg []
-  (-> js/d3
-      (.select "#main-fig")
-      (.append "svg")
-      (.attr "height" (:height main-fig-static-props))
-      (.attr "width" (:width main-fig-static-props))))
+  (let [viewbox-size (str "0 0 "
+                          (:width main-fig-static-props)
+                          " "
+                          (:height main-fig-static-props))]
+    (-> js/d3
+        (.select "#main-fig")
+        (.append "div")
+        (.classed "svg-container" true)
+        (.append "svg")
+        (.attr "preserveAspectRatio" "xMinYMin meet")
+        (.attr "viewBox" viewbox-size)
+        (.classed "svg-content-responsive" true))))
 
 (defn mount [el]
   (rdom/render [app] el))
