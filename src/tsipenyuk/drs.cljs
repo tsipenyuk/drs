@@ -4,113 +4,62 @@
    [reagent.core :as r]
    [reagent.dom :as rdom]
    [tsipenyuk.solarized :as ts]
+   [tsipenyuk.main-fig :as tm]
+   [tsipenyuk.term :as tt]
    [clojure.string :as str]
    [cljsjs.d3 :as d3]))
 
+;; helpers
 (defn multiply [a b] (* a b))
+(defn print-something [e] (println e))
+
+;; state
+;;
+(def main-fig-static-props
+  {:height 450
+   :width 540})
+
 (defonce term
   (r/atom
    {:mode "drs>"
     :input "Input command here"
-    :history ["New session has started." "Awaiting instructions..."]
-    :xmin -10
+    :history ["New session has started." "Awaiting instructions..."]}))
+
+(defonce main-fig-props
+  (r/atom
+   {:xmin -10
     :xmax 10
-    :ymid 0
-    }))
+    :ymid 0}))
 
-(defn get-app-element [] (gdom/getElement "app"))
-
-(defn list-term-history [items]
-  (let [numbered-items
-        (map vector items (range 1 (inc (count items))))]
-    [:div
-     (for [item numbered-items]
-       ^{:key (str item)} [:p.term-history-line (first item)])]))
-
-(defn term-history []
-  [:div.term-history
-   [list-term-history (take-last 2 (:history @term))]])
-
-(defn if-enter-was-pressed [xfunc]
-  (fn [e]
-    (if (= 13 (.-charCode e))
-      (xfunc))))
-
-(defn print-something [e] (println e))
-(defn update-term-history [line]
-  (swap! term assoc :history
-         (conj (:history @term) line)))
-
-(defn term-input [value]
-  [:input {:type "text"
-           :value @value
-           ;; :auto-focus true
-           :on-key-press
-           (if-enter-was-pressed
-            (fn []
-              (do
-                (update-term-history @value)
-                (reset! value ""))))
-           :on-change #(reset! value (-> % .-target .-value))}])
-
+;; svg
 (defn remove-svg []
   (-> js/d3
       (.selectAll "#slopegraph svg")
       (.remove)))
 
-
-(defn term-duplicate-input []
-  [:p.term-duplicate-input
-   (:value (first (take-last 1 (tsipenyuk.drs/term-input []))))])
-
-(defn term-input-wrapper []
-  (let [val (r/atom "")]
-    (fn []
-      [:div.term-input-wrapper                                      ;; <1>
-       [:label (:mode @term)]
-       [term-input val]])))
-
-(defn term-c []
-  [:div.term
-   [term-history]
-   [term-input-wrapper]])
-
-(defn main-fig []
-  [:div
-   {:id "main-fig"
-    :style {:margin-left 10
-            :background-color "white"
-            :width "95%"}}
-   ])
-
+;; app
+(defn get-app-element [] (gdom/getElement "app"))
 (defn app []
   [:div
-   [term-c]
-   [main-fig]
-   ]
-  )
+   [tt/terminal term]
+   [tm/main-fig]])
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; data
-
-(def height 450)
-(def width 540)
 (defn ymax []
-  (let [delta-x (- (:xmax @term) (:xmin @term))]
-    (/ (* delta-x height) (* 2 width))
-    ))
+  (let [delta-x (- (:xmax @main-fig-props) (:xmin @main-fig-props))]
+    (/ (* delta-x (:height main-fig-static-props)) (* 2 (:width main-fig-static-props)))))
 (defn ymin []
   (- 0 (ymax)))
 
 (defn scale-x [x]
-  (* width (/ (- x (:xmin @term)) (- (:xmax @term) (:xmin @term)))))
+  (* (:width main-fig-static-props) (/ (- x (:xmin @main-fig-props)) (- (:xmax @main-fig-props) (:xmin @main-fig-props)))))
 
 (defn scale-y [y]
-   (* height (/ (- y (ymin)) (- (ymax) (ymin)))))
+  (* (:height main-fig-static-props) (/ (- y (ymin)) (- (ymax) (ymin)))))
 
 (defn scale-number [x]
-  (* width (/ x (- (:xmax @term) (:xmin @term)))))
-
+  (* (:width main-fig-static-props) (/ x (- (:xmax @main-fig-props) (:xmin @main-fig-props)))))
 
 (def data {2005 {:natural-gas 0.2008611514256557
                  :coal        0.48970650816857986
@@ -130,7 +79,7 @@
   (-> js/d3
       (.scaleLinear)
       (.domain #js [0 1])
-      (.range #js [(- height 15) 0])))
+      (.range #js [(- (:height main-fig-static-props) 15) 0])))
 
 (defn format-percent [value]
   ((.format js/d3 ".2%") value))
@@ -143,7 +92,6 @@
 (defn attrs [el m]
   (doseq [[k v] m]
     (.attr el k v)))
-
 
 (defn data-join [parent tag class data]
   (let [join  (-> parent
@@ -179,8 +127,8 @@
 ;;     (attrs (merge custom-attrs
 ;;             {"y" (fn [[_ v]] (height-scale v))}))))
 
-(def column-1-start (/ width 4))
-(def column-space (* 3 (/ width 4)))
+(def column-1-start (/ (:width main-fig-static-props) 4))
+(def column-space (* 3 (/ (:width main-fig-static-props) 4)))
 
 (defn draw-header [svg years]
   (-> svg
@@ -202,16 +150,12 @@
 
 (defn draw-circle [svg]
   (-> svg
-    (.append "circle")
-    (attrs {
-            "cx" (scale-x 0)
-            "cy" (scale-y 0)
-            "r" (scale-number 1)
-            "stroke" "black"
-            "fill" (:orange ts/solarized)
-            })
-    ))
-
+      (.append "circle")
+      (attrs {"cx" (scale-x 0)
+              "cy" (scale-y 0)
+              "r" (scale-number 1)
+              "stroke" "black"
+              "fill" (:orange ts/solarized)})))
 
 (defn draw-slopegraph [svg data]
   (let [data-2005 (get data 2005)
@@ -222,19 +166,19 @@
 
     (draw-header svg [2005 2015])
     (draw-line svg data-2005 data-2015)
-    (draw-circle svg)
-    ))
+    (draw-circle svg)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Lifecycle
 
+
 (defn append-svg []
   (-> js/d3
       (.select "#main-fig")
       (.append "svg")
-      (.attr "height" height)
-      (.attr "width" width)))
+      (.attr "height" (:height main-fig-static-props))
+      (.attr "width" (:width main-fig-static-props))))
 
 (defn mount [el]
   (rdom/render [app] el))
@@ -245,11 +189,12 @@
       (mount el)
       ;; (append-svg)
       (let [svg (append-svg)]
-        (draw-slopegraph svg data))
-      )))
+        (draw-slopegraph svg data)))))
 
 ;; conditionally start your application based on the presence of an "app" element
 ;; this is particularly helpful for testing this ns without launching the app
+
+
 (mount-app-element)
 
 ;; specify reload hook with ^:after-load metadata
