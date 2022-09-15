@@ -14,7 +14,6 @@
 (defn print-something [e] (println e))
 
 ;; state
-;;
 (def main-fig-static-props
   {:height 600
    :width 800})
@@ -33,11 +32,14 @@
     :xmax 10
     :ymid 0}))
 
+
 ;; svg
 (defn remove-svg []
   (-> js/d3
-      (.selectAll "#slopegraph svg")
+      (.selectAll "#main-fig div")
       (.remove)))
+
+
 
 ;; app
 (defn get-app-element [] (gdom/getElement "app"))
@@ -175,6 +177,7 @@
 ;; Lifecycle
 
 
+
 (defn append-svg []
   (let [viewbox-size (str "0 0 "
                           (:width main-fig-static-props)
@@ -196,20 +199,26 @@
   (when-let [el (get-app-element)]
     (do
       (mount el)
-      ;; (append-svg)
       (let [svg (append-svg)]
         (draw-slopegraph svg data)))))
 
+;; (defn mount-app-element []
+;;   (when-let [el (get-app-element)]
+;;     (do
+;;       (mount el)
+;;       ;; (append-svg)
+;;       (let [svg (append-svg)]
+;;         (draw-slopegraph svg data)))))
+
 ;; conditionally start your application based on the presence of an "app" element
 ;; this is particularly helpful for testing this ns without launching the app
-
 
 (mount-app-element)
 
 ;; specify reload hook with ^:after-load metadata
 (defn ^:after-load on-reload []
-  (mount-app-element)
   (remove-svg)
+  (mount-app-element)
   ;; optionally touch your app-state to force rerendering depending on
   ;; your application
   ;; (swap! app-state update-in [:__figwheel_counter] inc)
