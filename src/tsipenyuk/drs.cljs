@@ -1,13 +1,15 @@
 (ns ^:figwheel-hooks tsipenyuk.drs
   (:require
+   [cljsjs.d3 :as d3]
+   [clojure.string :as str]
    [goog.dom :as gdom]
    [reagent.core :as r]
    [reagent.dom :as rdom]
-   [tsipenyuk.solarized :as ts]
+   [tsipenyuk.draw :as td]
    [tsipenyuk.main-fig :as tm]
+   [tsipenyuk.solarized :as ts]
    [tsipenyuk.term :as tt]
-   [clojure.string :as str]
-   [cljsjs.d3 :as d3]))
+   ))
 
 ;; helpers
 (defn multiply [a b] (* a b))
@@ -18,8 +20,6 @@
   {:height 600
    :width 800})
 
-(print-something (str "0 0 " (:height main-fig-static-props) " " (:width main-fig-static-props)))
-
 (defonce term
   (r/atom
    {:mode "drs>"
@@ -28,17 +28,16 @@
 
 (defonce main-fig-props
   (r/atom
-   {:xmin -10
+   {:height 600
+    :width 800
+    :xmin -10
     :xmax 10
     :ymid 0}))
 
-
-;; svg
-(defn remove-svg []
-  (-> js/d3
-      (.selectAll "#main-fig div")
-      (.remove)))
-
+(defonce fp-sets
+  (r/atom
+   {:x-set {:balls [[-3.5 5.0 1.5] [-1.5 -4 2]]}
+    :y-set {:balls [[ 3.5 4.5 1.0] [ 1.5 -4 2]]}}))
 
 
 ;; app
@@ -50,21 +49,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; data
-(defn ymax []
-  (let [delta-x (- (:xmax @main-fig-props) (:xmin @main-fig-props))]
-    (/ (* delta-x (:height main-fig-static-props)) (* 2 (:width main-fig-static-props)))))
-(defn ymin []
-  (- 0 (ymax)))
-
-(defn scale-x [x]
-  (* (:width main-fig-static-props) (/ (- x (:xmin @main-fig-props)) (- (:xmax @main-fig-props) (:xmin @main-fig-props)))))
-
-(defn scale-y [y]
-  (* (:height main-fig-static-props) (/ (- y (ymin)) (- (ymax) (ymin)))))
-
-(defn scale-number [x]
-  (* (:width main-fig-static-props) (/ x (- (:xmax @main-fig-props) (:xmin @main-fig-props)))))
-
 (def data {2005 {:natural-gas 0.2008611514256557
                  :coal        0.48970650816857986
                  :nuclear     0.19367190804075465
@@ -76,14 +60,13 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helpers
-
 (def scale [])
 
 (def height-scale
   (-> js/d3
       (.scaleLinear)
       (.domain #js [0 1])
-      (.range #js [(- (:height main-fig-static-props) 15) 0])))
+      (.range #js [(- (:height @main-fig-props) 15) 0])))
 
 (defn format-percent [value]
   ((.format js/d3 ".2%") value))
@@ -131,8 +114,8 @@
 ;;     (attrs (merge custom-attrs
 ;;             {"y" (fn [[_ v]] (height-scale v))}))))
 
-(def column-1-start (/ (:width main-fig-static-props) 4))
-(def column-space (* 3 (/ (:width main-fig-static-props) 4)))
+(def column-1-start (/ (:width @main-fig-props) 4))
+(def column-space (* 3 (/ (:width @main-fig-props) 4)))
 
 (defn draw-header [svg years]
   (-> svg
@@ -152,14 +135,6 @@
               "y2" (fn [[k _]]
                      (height-scale (get data-col-2 k)))})))
 
-(defn draw-circle [svg]
-  (-> svg
-      (.append "circle")
-      (attrs {"cx" (scale-x 0)
-              "cy" (scale-y 0)
-              "r" (scale-number 1)
-              "stroke" "black"
-              "fill" (:orange ts/solarized)})))
 
 (defn draw-slopegraph [svg data]
   (let [data-2005 (get data 2005)
@@ -170,28 +145,13 @@
 
     (draw-header svg [2005 2015])
     (draw-line svg data-2005 data-2015)
-    (draw-circle svg)))
+    (td/draw-sets svg fp-sets main-fig-props)
+    ;; (td/draw-set svg (:x-set @fp-sets) main-fig-props (:red ts/solarized) "0.5")
+    ))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Lifecycle
-
-
-
-(defn append-svg []
-  (let [viewbox-size (str "0 0 "
-                          (:width main-fig-static-props)
-                          " "
-                          (:height main-fig-static-props))]
-    (-> js/d3
-        (.select "#main-fig")
-        (.append "div")
-        (.classed "svg-container" true)
-        (.append "svg")
-        (.attr "preserveAspectRatio" "xMinYMin meet")
-        (.attr "viewBox" viewbox-size)
-        (.classed "svg-content-responsive" true))))
-
 (defn mount [el]
   (rdom/render [app] el))
 
@@ -199,25 +159,16 @@
   (when-let [el (get-app-element)]
     (do
       (mount el)
-      (let [svg (append-svg)]
+      (let [svg (tm/append-svg main-fig-props)]
         (draw-slopegraph svg data)))))
-
-;; (defn mount-app-element []
-;;   (when-let [el (get-app-element)]
-;;     (do
-;;       (mount el)
-;;       ;; (append-svg)
-;;       (let [svg (append-svg)]
-;;         (draw-slopegraph svg data)))))
 
 ;; conditionally start your application based on the presence of an "app" element
 ;; this is particularly helpful for testing this ns without launching the app
-
 (mount-app-element)
 
 ;; specify reload hook with ^:after-load metadata
 (defn ^:after-load on-reload []
-  (remove-svg)
+  (tm/remove-svg)
   (mount-app-element)
   ;; optionally touch your app-state to force rerendering depending on
   ;; your application

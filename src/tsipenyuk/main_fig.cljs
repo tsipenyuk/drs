@@ -1,5 +1,10 @@
 (ns tsipenyuk.main-fig
   (:require
+   [cljsjs.d3 :as d3]
+   [clojure.string :as str]
+   [goog.dom :as gdom]
+   [reagent.core :as r]
+   [reagent.dom :as rdom]
    [tsipenyuk.solarized :as ts]))
 
 (defn main-fig []
@@ -13,30 +18,21 @@
             :width "95%"}}
    ])
 
-(defn scale-x [x main-fig-props]
-  (let [xmin (:xmin @main-fig-props)
-        xmax (:xmax @main-fig-props)]
-    (* width (/ (- x xmin) (- xmax xmin)))))
+;; svg
+(defn remove-svg []
+  (-> js/d3
+      (.selectAll "#main-fig div")
+      (.remove)))
 
-(defn scale-y [y]
-  (let [xmin (:xmin @main-fig-props)
-        xmax (:xmax @main-fig-props)]
-   (* height (/ (- y (ymin)) (- (ymax) (ymin)))))
-
-(defn scale-number [x]
-  (* width (/ x (- (:xmax @term) (:xmin @term)))))
-
-(defn draw-ball [svg ball]
-  (let [[x y r] ball]
-    (-> svg
-        (.append "circle")
-        (attrs {
-                "cx" (scale-x x)
-                "cy" (scale-y y)
-                "r" (scale-number r)
-                "stroke" (:orange ts/solarized)
-                "fill" (:orange ts/solarized)
-                })
-        )
-    )
-  )
+(defn append-svg [fig-props]
+  (let [viewbox-size
+        (str "0 0 " (:width @fig-props)
+             " " (:height @fig-props))]
+    (-> js/d3
+        (.select "#main-fig")
+        (.append "div")
+        (.classed "svg-container" true)
+        (.append "svg")
+        (.attr "preserveAspectRatio" "xMinYMin meet")
+        (.attr "viewBox" viewbox-size)
+        (.classed "svg-content-responsive" true))))
