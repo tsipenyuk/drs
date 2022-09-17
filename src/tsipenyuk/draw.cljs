@@ -51,6 +51,71 @@
     )
   )
 
+(defn draw-pt [svg pt fig-props color opac]
+  (let [[x y] pt]
+    (-> svg
+        (.append "circle")
+        (attrs {
+                "cx" (scale-x x fig-props)
+                "cy" (scale-y y fig-props)
+                "r" "2"
+                "stroke" color
+                "fill" color
+                "opacity" opac
+                })
+        )
+    )
+  )
+
+(defn draw-line [svg start end fig-props color opac]
+  (let [[x1 y1] start
+        [x2 y2] end]
+    (-> svg
+        (.append "line")
+        (attrs {
+                "x1" (scale-x x1 fig-props)
+                "y1" (scale-y y1 fig-props)
+                "x2" (scale-x x2 fig-props)
+                "y2" (scale-y y2 fig-props)
+                "stroke" color
+                "opacity" opac
+                })
+        )
+    )
+  )
+
+;; draw a line with a little perp line ("hammer") at the end
+(defn draw-hammer [svg start end h-size fig-props color opac]
+  (let [[x1 y1] start
+        [x2 y2] end
+        [xdiff ydiff] [(- x2 x1) (- y2 y1)]
+        [xrot yrot] [(- 0 ydiff) xdiff]
+        rot-abs (Math/sqrt (+ (* xrot xrot) (* yrot yrot)))
+        [xnrm ynrm] [(/ xrot rot-abs) (/ yrot rot-abs)]
+        [xpt ypt] [(scale-x xnrm fig-props)
+                   (scale-y ynrm fig-props)]
+        hammer-size (Math/sqrt (+ (* xpt xpt) (* ypt ypt)))
+        hammer-scale (/ hammer-size h-size)
+        [xsc ysc] [(/ xnrm hammer-scale) (/ ynrm hammer-scale)]
+        hammer-start [(+ x2 xsc) (+ y2 ysc)]
+        hammer-end [(- x2 xsc) (- y2 ysc)]
+        ]
+    (do
+      (draw-line svg start end fig-props color opac)
+      (println hammer-start hammer-end end)
+      (draw-line svg hammer-start hammer-end fig-props color opac)
+      )
+    )
+  )
+
+(defn draw-hammers [svg points hammer-size-in-pts fig-props color opac]
+  (let [repacked (map vector (butlast points) (rest points))]
+    (dorun
+     (for [point repacked]
+       (let [[start end] point]
+         (draw-hammer svg start end hammer-size-in-pts fig-props color opac)
+         )))))
+
 (defn draw-set [svg set fig-props set-color opac]
     (dorun
      (for [ball (:balls set)]

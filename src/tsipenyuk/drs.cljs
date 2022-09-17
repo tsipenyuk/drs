@@ -146,9 +146,12 @@
     (draw-header svg [2005 2015])
     (draw-line svg data-2005 data-2015)
     (td/draw-sets svg fp-sets main-fig-props)
+    (td/draw-pt svg [-0.3 0] main-fig-props (:base03 ts/solarized) "1")
+    ;; (td/draw-line svg [0 0] [1 1] main-fig-props (:base03 ts/solarized) "1")
+    ;; (td/draw-hammer svg [0 0] [1 1] 30 main-fig-props (:base03 ts/solarized) "1")
+    (td/draw-hammers svg [[-0.3 0] [0 0] [1 1] [2 3] [4 5] [5 0] [7 0]] 50 main-fig-props (:base03 ts/solarized) "1")
     ;; (td/draw-set svg (:x-set @fp-sets) main-fig-props (:red ts/solarized) "0.5")
     ))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Lifecycle
