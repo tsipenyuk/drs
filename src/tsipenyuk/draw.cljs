@@ -35,8 +35,9 @@
   (* (:width @fig-props) (/ x (- (:xmax @fig-props) (:xmin @fig-props)))))
 
 
-(defn draw-ball [svg ball fig-props ball-color opac]
-  (let [[x y r] ball]
+(defn draw-ball [svg ball settings]
+  (let [[x y r] ball
+        [fig-props ball-color opac] settings]
     (-> svg
         (.append "circle")
         (attrs {
@@ -51,8 +52,9 @@
     )
   )
 
-(defn draw-pt [svg pt fig-props color opac]
-  (let [[x y] pt]
+(defn draw-pt [svg pt settings]
+  (let [[x y] pt
+        [fig-props color opac] settings]
     (-> svg
         (.append "circle")
         (attrs {
@@ -61,15 +63,12 @@
                 "r" "2"
                 "stroke" color
                 "fill" color
-                "opacity" opac
-                })
-        )
-    )
-  )
+                "opacity" opac}))))
 
-(defn draw-line [svg start end fig-props color opac]
+(defn draw-line [svg start end settings]
   (let [[x1 y1] start
-        [x2 y2] end]
+        [x2 y2] end
+        [fig-props color opac stroke-dasharray] settings]
     (-> svg
         (.append "line")
         (attrs {
@@ -79,15 +78,13 @@
                 "y2" (scale-y y2 fig-props)
                 "stroke" color
                 "opacity" opac
-                })
-        )
-    )
-  )
+                "stroke-dasharray" stroke-dasharray}))))
 
 ;; draw a line with a little perp line ("hammer") at the end
-(defn draw-hammer [svg start end h-size fig-props color opac]
+(defn draw-hammer [svg start end h-size settings]
   (let [[x1 y1] start
         [x2 y2] end
+        [fig-props color opac stroke-dasharray] settings
         [xdiff ydiff] [(- x2 x1) (- y2 y1)]
         [xrot yrot] [(- 0 ydiff) xdiff]
         rot-abs (Math/sqrt (+ (* xrot xrot) (* yrot yrot)))
@@ -101,32 +98,31 @@
         hammer-end [(- x2 xsc) (- y2 ysc)]
         ]
     (do
-      (draw-line svg start end fig-props color opac)
-      (println hammer-start hammer-end end)
-      (draw-line svg hammer-start hammer-end fig-props color opac)
+      (draw-line svg start end settings)
+      (draw-line svg hammer-start hammer-end (butlast settings))
       )
     )
   )
 
-(defn draw-hammers [svg points hammer-size-in-pts fig-props color opac]
+(defn draw-hammers [svg points hammer-size-in-pts settings]
   (let [repacked (map vector (butlast points) (rest points))]
     (dorun
      (for [point repacked]
        (let [[start end] point]
-         (draw-hammer svg start end hammer-size-in-pts fig-props color opac)
+         (draw-hammer svg start end hammer-size-in-pts settings)
          )))))
 
-(defn draw-set [svg set fig-props set-color opac]
+(defn draw-set [svg set settings]
     (dorun
      (for [ball (:balls set)]
-        (draw-ball svg ball fig-props set-color opac))))
+        (draw-ball svg ball settings))))
 
 (defn draw-sets [svg fp-sets fig-props]
   (let [x-set (:x-set @fp-sets)
         y-set (:y-set @fp-sets)]
     (do
-      (draw-set svg x-set fig-props (:red ts/solarized) "1.0")
-      (draw-set svg y-set fig-props (:blue ts/solarized) "1.0")
-      (draw-set svg x-set fig-props (:red ts/solarized) "0.5")
+      (draw-set svg x-set [fig-props (:red ts/solarized) "1.0"])
+      (draw-set svg y-set [fig-props (:blue ts/solarized) "1.0"])
+      (draw-set svg x-set [fig-props (:red ts/solarized) "0.5"])
       )
     ))
