@@ -11,6 +11,10 @@
 ;; multiply is an example for testing, see test folder
 (defn multiply [a b] (* a b))
 
+(defonce state
+  (r/atom
+   {:mode "drs>"}))
+
 (defonce term
   (r/atom
    {:mode "drs>"
@@ -18,14 +22,15 @@
     :history ["New session has started." "Awaiting instructions..."]}))
 
 (defn terminal [term]
-  [:span.term
-   "hello, world1"])
+  [:div
+   {:style       {:width "100%"}}
+   "Douglas-Rachford Sandbox"])
 
 (defn term-textarea [state]
-  [:input
+  [:textarea#term-textarea
    {:type        "text"
-    :style       {:display "block"}
-    :placeholder "Username"
+    :style       {:width "100%" :height "100%"}
+    :placeholder "Type or load a script..."
     :value       @state
     :on-change   (fn [event]
                    (reset! state (-> event .-target .-value)))}])
@@ -33,16 +38,25 @@
 (defn term-textarea-wrapper [term]
   (let [val (r/atom "")]
     (fn []
-      [:div.term-input-wrapper                                      ;; <1>
-       [:label (:mode @term)]
+      [:div#term-textarea-wrapper
        [term-textarea val]])))
+
+(defn term-button [state]
+  [:button
+   {:type        "button"
+    :style       {:display "block"}}
+   "Run"
+   ])
 
 ;; app
 (defn get-app-element [] (gdom/getElement "app"))
 (defn app []
-  [:div
-   [terminal term]
-   [term-textarea-wrapper term]
+  [:div#drs-wrapper
+   [:div#terminal
+    [terminal term]
+    [term-textarea-wrapper term]
+    [term-button term]
+    ]
    ])
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

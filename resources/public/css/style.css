@@ -16,6 +16,17 @@
   --blue: #268bd2;
   --cyan: #2aa198;
   --green: #859900;
+
+  --app-margin: 8px;
+}
+
+html {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  margin: 0;
 }
 
 html,
@@ -56,7 +67,7 @@ h1 {
   font-weight: 300;
 }
 
-input {
+input, textarea {
   color: var(--base0);
   background-color: var(--base2);
   border: 0pt;
@@ -71,14 +82,33 @@ textarea:focus, input:focus{
   outline-color: var(--base0);
 }
 
-
-.term {
-  display: fixed;
-  background-color: var(--base2);
-  color: var(--base0);
-  width: clamp(400px, 60vw, 1000px);
-  margin: auto;
+#app {
+  width: calc(100vw - 2 * var(--app-margin));
+  height: calc(100vh - 2 * var(--app-margin));
+  margin: var(--app-margin);
 }
+
+#terminal {
+  display: flex;
+  height: calc(100vh - 2 * var(--app-margin));
+  width: 50%;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+#term-textarea-wrapper {
+  width: 100%;
+  flex-grow: 1;
+}
+
+/* .term { */
+/*   display: fixed; */
+/*   background-color: var(--base2); */
+/*   color: var(--base0); */
+/*   width: clamp(400px, 60vw, 1000px); */
+/*   margin: auto; */
+/* } */
 
 .term-history, .term-history-line,
 .term-duplicate-input
