@@ -13,7 +13,10 @@
 
 (defonce state
   (r/atom
-   {:mode "drs>"}))
+   {:mode "drs>"
+    :current-output "<Script output will be here>"
+    :code ""
+    }))
 
 (defonce term
   (r/atom
@@ -21,32 +24,39 @@
     :input "Input command here"
     :history ["New session has started." "Awaiting instructions..."]}))
 
-(defn terminal [term]
-  [:div
-   {:style       {:width "100%"}}
-   "Douglas-Rachford Sandbox"])
+(defn terminal [term] [:div "Douglas-Rachford Sandbox"])
 
 (defn term-textarea [state]
+  ;; (let [code (r/cursor state [:code])]
   [:textarea#term-textarea
    {:type        "text"
     :style       {:width "100%" :height "100%"}
     :placeholder "Type or load a script..."
     :value       @state
     :on-change   (fn [event]
-                   (reset! state (-> event .-target .-value)))}])
+                     (reset! state (-> event .-target .-value)))}])
 
-(defn term-textarea-wrapper [term]
-  (let [val (r/atom "")]
+(defn term-textarea-wrapper [state]
+  (let [code (r/cursor state [:code])]
     (fn []
       [:div#term-textarea-wrapper
-       [term-textarea val]])))
+       [term-textarea code]])))
+
+(defn eval-code [code]
+  @code)
 
 (defn term-button [state]
+  (let [code (r/cursor state [:code])
+        output (r/cursor state [:current-output])]
   [:button
    {:type        "button"
-    :style       {:display "block"}}
+    :style       {:display "block"}
+    :on-click (fn [] (reset! output (eval-code code)))}
    "Run"
-   ])
+   ]))
+
+(defn current-output [state]
+  [:div (:current-output @state)])
 
 ;; app
 (defn get-app-element [] (gdom/getElement "app"))
@@ -54,8 +64,11 @@
   [:div#drs-wrapper
    [:div#terminal
     [terminal term]
-    [term-textarea-wrapper term]
-    [term-button term]
+    [term-textarea-wrapper state]
+    [term-button state]
+    ]
+   [:div#output
+    [current-output state]
     ]
    ])
 

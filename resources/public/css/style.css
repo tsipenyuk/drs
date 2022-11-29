@@ -88,6 +88,14 @@ textarea:focus, input:focus{
   margin: var(--app-margin);
 }
 
+#drs-wrapper {
+  display: flex;
+}
+
+#output {
+  width: 50%;
+}
+
 #terminal {
   display: flex;
   height: calc(100vh - 2 * var(--app-margin));
