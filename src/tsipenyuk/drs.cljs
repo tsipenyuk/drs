@@ -43,7 +43,10 @@
        [term-textarea code]])))
 
 (defn eval-code [code]
-  @code)
+  ((. js/document -myPrint) "World"))
+  ;; (js/console.log "Logged using js!" js/test))
+  ;; (js/myPrint 5))
+  ;; @code)
 
 (defn term-button [state]
   (let [code (r/cursor state [:code])
