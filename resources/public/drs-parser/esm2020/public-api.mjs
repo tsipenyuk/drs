@@ -1,8 +1,0 @@
-/*
- * Public API Surface of drs-parser
- */
-export * from './lib/drs-parser.service';
-export * from './lib/drs-parser.component';
-export * from './lib/drs-parser.module';
-export * from './lib/drs-parser';
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicHVibGljLWFwaS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3Byb2plY3RzL2Rycy1wYXJzZXIvc3JjL3B1YmxpYy1hcGkudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7O0dBRUc7QUFFSCxjQUFjLDBCQUEwQixDQUFDO0FBQ3pDLGNBQWMsNEJBQTRCLENBQUM7QUFDM0MsY0FBYyx5QkFBeUIsQ0FBQztBQUN4QyxjQUFjLGtCQUFrQixDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiLypcbiAqIFB1YmxpYyBBUEkgU3VyZmFjZSBvZiBkcnMtcGFyc2VyXG4gKi9cblxuZXhwb3J0ICogZnJvbSAnLi9saWIvZHJzLXBhcnNlci5zZXJ2aWNlJztcbmV4cG9ydCAqIGZyb20gJy4vbGliL2Rycy1wYXJzZXIuY29tcG9uZW50JztcbmV4cG9ydCAqIGZyb20gJy4vbGliL2Rycy1wYXJzZXIubW9kdWxlJztcbmV4cG9ydCAqIGZyb20gJy4vbGliL2Rycy1wYXJzZXInO1xuIl19

@@ -1,4 +1,4 @@
-/* some style */
+/* solarized colors */
 :root {
   --base03: #002b36;
   --base02: #073642;
@@ -17,27 +17,20 @@
   --cyan: #2aa198;
   --green: #859900;
 
-  --app-margin: 8px;
+  --app-margin: 0.5rem;
 }
 
 html {
   height: 100%;
-  margin: 0;
+  margin: 0 !important;
+  background-color: var(--base3) !important;
+}
+
+nav {
+  margin: 0.25rem 0 !important;
 }
 
 body {
-  margin: 0;
-}
-
-html,
-body * {
-  color-profile: sRGB;
-  rendering-intent: auto;
-}
-
-body {
-  /* font-family: Helvetica, Arial, sans-serif; */
-  /* font-weight: 300; */
   font-family: "Fira Code";
   font-weight: 300;
 
@@ -62,10 +55,6 @@ body {
   }
 }
 
-h1 {
-  font-family: Helvetica, Arial, sans-serif;
-  font-weight: 300;
-}
 
 input, textarea {
   color: var(--base0);
@@ -83,26 +72,13 @@ textarea:focus, input:focus{
 }
 
 #app {
-  width: calc(100vw - 2 * var(--app-margin));
   height: calc(100vh - 2 * var(--app-margin));
   margin: var(--app-margin);
 }
 
 #drs-wrapper {
   display: flex;
-}
-
-#output {
-  width: 50%;
-}
-
-#terminal {
-  display: flex;
-  height: calc(100vh - 2 * var(--app-margin));
-  width: 50%;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-start;
+  margin: 0;
 }
 
 #term-textarea-wrapper {
@@ -110,41 +86,24 @@ textarea:focus, input:focus{
   flex-grow: 1;
 }
 
-/* .term { */
-/*   display: fixed; */
-/*   background-color: var(--base2); */
-/*   color: var(--base0); */
-/*   width: clamp(400px, 60vw, 1000px); */
-/*   margin: auto; */
-/* } */
-
-.term-history, .term-history-line,
-.term-duplicate-input
-{
-  margin: 0em;
+#terminal, #output {
+  width: 50%;
 }
 
-.term-input-wrapper {
-  width: 100%;
-  display: flex;
-}
-
-#main-fig {
-  max-width: 700px;
-  margin: auto !important;
-}
-
-.svg-container {
+.loading {
   display: inline-block;
-  position: relative;
-  width: 100%;
-  padding-bottom: 75%; /* aspect ratio */
-  vertical-align: top;
-  overflow: hidden;
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(40,40,40,.3);
+  border-radius: 50%;
+  border-top-color: #502020;
+  animation: spin 1s ease-in-out infinite;
+  -webkit-animation: spin 1s ease-in-out infinite;
 }
-.svg-content-responsive {
-  display: inline-block;
-  position: absolute;
-  top: 10px;
-  left: 0;
+
+@keyframes spin {
+  to { -webkit-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+  to { -webkit-transform: rotate(360deg); }
 }

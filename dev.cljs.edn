@@ -1,5 +1,6 @@
-^{:watch-dirs ["test" "src"]
-  :css-dirs ["resources/public/css"]
+^{:watch-dirs ["src" "tests"]
+  :extra-main-files {:tests {:main cljs-spa.test-runner}}
   :auto-testing true
-   }
-{:main tsipenyuk.drs}
+  :css-dirs ["resources/public/css"]
+  :ring-server-options {:port 9333}}
+{:output-to "target/public/compiled/app.js"}
