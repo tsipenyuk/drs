@@ -28,7 +28,22 @@ function gaussian(
     thetaInDegrees
   } = {...defaultParams, ...userParams}
 
+  // rotation matrix
   const thetaPi = thetaInDegrees * Math.PI / 180
+  const ct = Math.cos(thetaPi)
+  const st = Math.sin(thetaPi)
+  const Omx = nj.array([[ct, -st], [st, ct]])
+  const tOmx = nj.array([[ct, st], [-st, ct]])
+
+  // ensure correct variance
+  const sigma2 = nj.multiply(sigma, sigma)
+  const sigma2h = nj.divide(sigma2, 2)
+  const Dmx = nj.diag(nj.divide(nj.ones(2), sigma2h))
+
+  // combine rotation and variance
+  const DOmx = nj.dot(Dmx, Omx)
+  const Amx = nj.dot(tOmx, DOmx)
+
   const xGrid = stepRange(xMin, xMax, nPts[0])
   const yGrid = stepRange(yMin, yMax, nPts[1])
   let gaussian = nj.zeros(nPts)
@@ -37,16 +52,13 @@ function gaussian(
     for (const iy of Array(nPts[0]).keys()) {
       const x = xGrid.get(ix)
       const y = yGrid.get(iy)
-      gaussian.set(ix,iy, x+y)
+      const v = nj.subtract([x,y], mean)
+      const mv = nj.subtract(mean, [x,y])
+      const arg = nj.dot(mv, nj.dot(Amx, v)).tolist()[0]
+      const g = amplitude * Math.exp(arg)
+      gaussian.set(ix,iy,g)
     }
   }
-  console.log(xGrid)
-  console.log(yGrid)
-  console.log(gaussian)
-  // nj.arange()
-  // const res = nj.concatenate(nj.ones([4,4,1]), nj.zeros([4,4,1]))
-  // const res = nj.arange(24).reshape(3,4,2)
-  // const fres = nj.fft(res)
   return gaussian
 }
 

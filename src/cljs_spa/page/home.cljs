@@ -3,7 +3,7 @@
    [react-select :refer [default] :rename {default react-select}]
    [cljs-spa.state :refer [!state]]
    [reagent.core :as r]
-   [cljs-spa.page.scripts.default-code :as default-code]
+   [cljs-spa.page.scripts.test-gaussian :as default-code]
    ))
 
 (def options
@@ -58,7 +58,10 @@
 
 (defn parse-result [evaluated-code]
   (let [res (js->clj evaluated-code :keywordize-keys true)]
-    (:value (first (:plaintext res)))))
+    (do
+      (js/console.log (first (:heatmaps res)))
+      (js/console.log (:tolist (first (:heatmaps res))))
+      (:value (first (:plaintext res))))))
 
 (defn run-button-ui [state]
   (let [code (r/cursor state [:code])
