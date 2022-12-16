@@ -3,6 +3,7 @@
    [react-select :refer [default] :rename {default react-select}]
    [cljs-spa.state :refer [!state]]
    [reagent.core :as r]
+   [cljs-spa.draw :as draw]
    [cljs-spa.page.scripts.test-gaussian :as default-code]
    ))
 
@@ -59,8 +60,7 @@
 (defn parse-result [evaluated-code]
   (let [res (js->clj evaluated-code :keywordize-keys true)]
     (do
-      (js/console.log (first (:heatmaps res)))
-      (js/console.log (:tolist (first (:heatmaps res))))
+      (println (:value (first (:heatmaps res))))
       (:value (first (:plaintext res))))))
 
 (defn run-button-ui [state]
@@ -85,4 +85,5 @@
     ]
    [:div#output
     [current-output-ui drs-state]
+    [draw/svg-heatmap-ui]
     ]])

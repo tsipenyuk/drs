@@ -11,8 +11,10 @@ function parse(userInput) {
 
   console.debug(`User input: ${userInput}`)
   console.debug(`Parsed script: ${parsedScript}`)
-  console.debug(`Result: ${result}`)
+  console.debug(`Result:`, result)
 
+
+  console.warn(outputNd2Js(result))
   return outputNd2Js(result)
 }
 

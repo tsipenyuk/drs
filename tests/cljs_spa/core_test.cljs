@@ -1,37 +1,20 @@
 (ns cljs-spa.core-test
   (:require [clojure.core]
             [clojure.test :refer-macros
-             [deftest testing is async use-fixtures]]))
+             [deftest testing is async use-fixtures]]
+            [cljs-spa.draw-coordinate-conversion :as dcc]
+            [cljs-spa.add-index :as ai]
+            ))
 
-(defn promise-test [p]
-  (reify
-    clojure.test/IAsyncTest
-    clojure.core/IFn
-      (-invoke [_ done]
-        (-> p
-            (.catch (fn [e]
-                      (js/console.error e)
-                      (is false (str "Promise rejected: " (.-message e)))))
-            (.finally done)))))
+(deftest rel2abs
+  (is (= [400 300] (dcc/rel2abs [0 0 800 600] [0.5 0.5])))
+  (is (= [400 360] (dcc/rel2abs [0 0 800 600] [0.5 0.6]))))
 
-(defn slowly+
-  ([ms] (slowly+ nil ms))
-  ([v ms] (js/Promise. (fn [resolve reject] (js/setTimeout #(resolve v) ms)))))
-
-(defn with-timeout+
-  ([p] (with-timeout+ p 50))
-  ([p ms]
-   (js/Promise.race
-     [p
-      (-> (slowly+ ms)
-          (.then
-            (fn []
-              (throw (js/Error.
-                       (str "Promise failed to resolve in " ms "ms"))))))])))
-
-(deftest arithmetic-test-expected-to-fail (testing "hello" (is (= 3 (+ 1 7)))))
-
-(deftest async-test-expected-to-fail-with-timeout
-  (promise-test (-> (slowly+ 500)
-                    with-timeout+
-                    (.then (fn [] (is (= 1 2)))))))
+(deftest add-index
+  (is (= [{:val 1, :x 0} {:val 2, :x 1}]
+         (ai/add-x [1 2])))
+  (is (= [{:val 1, :x 0, :y 5} {:val 2, :x 1, :y 5}]
+         (ai/add-constant-y (ai/add-x [1 2]) 5))
+      (is (= [[{:val 1, :x 0, :y 0} {:val 2, :x 1, :y 0}]
+              [{:val 3, :x 0, :y 1} {:val 4, :x 1, :y 1}]]
+             (ai/add-y [[1 2] [3 4]])))))
