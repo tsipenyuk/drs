@@ -4,15 +4,11 @@
   (vec (map-indexed (fn [idx itm] {:val itm :x idx}) one-dim-array)))
 
 (defn add-constant-y [one-dim-array-with-x constant-y]
-  (vec
-   (map (fn [x] (conj x {:y constant-y})) one-dim-array-with-x)
-   )
-  )
+   (mapv (fn [x] (conj x {:y constant-y})) one-dim-array-with-x))
 
-(defn add-y [two-dim-array]
+(defn add-xy [two-dim-array]
   (vec
    (map-indexed
     (fn [y one-dim-array]
       (add-constant-y (add-x one-dim-array) y))
-    two-dim-array))
-  )
+    two-dim-array)))

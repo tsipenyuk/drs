@@ -25,3 +25,12 @@
 (defn set-interval [interval & args]
   (when interval (js/clearInterval interval))
   (.apply js/setInterval nil (into-array args)))
+
+;; apply func to all elems of a 2-dim vector
+(defn mapv-2d [func arr-2d]
+  (mapv
+   (fn [arr-1d] (mapv func arr-1d))
+   arr-2d))
+
+(defn flatten-one-layer [nested]
+  (reduce (fn [x y] (apply conj x y)) nested))
