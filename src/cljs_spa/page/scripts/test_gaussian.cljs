@@ -3,13 +3,13 @@
 
 (defonce value
 "const init = gaussian({
-    nPts: [5,5],
-    sigma: [0.5, 1.5],
-    thetaInDegrees: 10
+    nPts: [64,64],
+    sigma: [.05, .15],
+    thetaInDegrees: 15
   })
 
 return {
   plaintext: [{name: \"four\", value: 4}],
-  heatmaps: [{name: \"gaussian\", value: init}],
+  heatmaps: [{name: \"A lone gaussian\", value: init}],
 }
 ")

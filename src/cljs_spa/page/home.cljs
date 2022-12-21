@@ -32,7 +32,10 @@
 (defonce drs-state
   (r/atom
    {:mode "drs>"
-    :current-output "<Script output will be here>"
+    :current-output
+    {:plaintext ["<Script output will be here>"]
+     :heatmaps []
+     :graphs []}
     :code default-code/value
     }))
 
@@ -60,8 +63,8 @@
 (defn parse-result [evaluated-code]
   (let [res (js->clj evaluated-code :keywordize-keys true)]
     (do
-      (println (:value (first (:heatmaps res))))
-      (:value (first (:plaintext res))))))
+      (println res)
+      res)))
 
 (defn run-button-ui [state]
   (let [code (r/cursor state [:code])
@@ -74,7 +77,14 @@
    ]))
 
 (defn current-output-ui [state]
-  [:div (:current-output @state)])
+  (let [output (:current-output @state)
+        heatmaps (r/cursor state [:current-output :heatmaps])]
+      [:div
+       [:div#plaintext (str (first (:plaintext output)))]
+       [draw/svg-heatmap-ui [100 0 700 600] heatmaps]
+       ;; [draw/svg-heatmap-test]
+       [:div#heatmaps"hello, heatmaps"]
+       ]))
 
 (defn page-ui []
   [:div#drs-wrapper
@@ -85,5 +95,5 @@
     ]
    [:div#output
     [current-output-ui drs-state]
-    [draw/svg-heatmap-ui]
+    ;; [draw/svg-heatmap-ui]
     ]])

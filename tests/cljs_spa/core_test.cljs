@@ -35,9 +35,9 @@
            (dcc/two-dim-index2coord canvas-box two-dim-index-array)))))
 
 (deftest select-color
-  (is (= {:color "#f7f7f7", :lower-bd -1e-9} (sc/select-color c/red-blue-8 0)))
-  (is (= {:color "#b2182b", :lower-bd ##-Inf} (sc/select-color c/red-blue-8 -10)))
-  (is (= {:color "#b2182b" :lower-bd 1e-0} (sc/select-color c/red-blue-8 10))))
+  (is (= "#f7f7f7" (sc/select-color c/red-blue-8 0)))
+  (is (= "#b2182b" (sc/select-color c/red-blue-8 -10)))
+  (is (= "#b2182b" (sc/select-color c/red-blue-8 10))))
 
 
 (deftest draw-heatmap-pt-rect
@@ -47,5 +47,5 @@
   (is (= [1 2 3 4] (u/flatten-one-layer [[1] [2] [3] [4]]))))
 
 (deftest draw-heatmap-g
-  (is (= [:g {:width 5, :height 5} '([:rect {:x 3.5, :y 2.5, :style "fill: #d6604d;"}] [:rect {:x 8.5, :y 2.5, :style "fill: #d6604d;"}] [:rect {:x 3.5, :y 7.5, :style "fill: #b2182b;"}] [:rect {:x 8.5, :y 7.5, :style "fill: #b2182b;"}])] (d/draw-heatmap-g [1 0 11 10] [[0.1 0.2] [1 2]]))))
-  ;; (is (= [] (d/draw-heatmap-g [1 0 11 10] [[0.1 0.2] [1 2]]))))
+  (is (= [:g {:width 5, :height 5, :style {:transform "translate(0.5px,0px)"}} '([:rect {:val 0.1, :x 3.5, :y 2.5, :width 5, :height 5, :style {:fill "#d6604d"}}] [:rect {:val 0.2, :x 8.5, :y 2.5, :width 5, :height 5, :style {:fill "#d6604d"}}] [:rect {:val 1, :x 3.5, :y 7.5, :width 5, :height 5, :style {:fill "#b2182b"}}] [:rect {:val 2, :x 8.5, :y 7.5, :width 5, :height 5, :style {:fill "#b2182b"}}])]
+         (d/draw-heatmap-g [1 0 11 10] [[0.1 0.2] [1 2]]))))
