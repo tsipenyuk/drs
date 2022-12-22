@@ -7,28 +7,6 @@
    [cljs-spa.page.scripts.test-gaussian :as default-code]
    ))
 
-(def options
-  [{:value "simplicity", :label "simplicity"}
-   {:value "immutable data", :label "immutable data"}
-   {:value "lazy sequences", :label "lazy sequences"}])
-
-(defn selector-ui []
-  [:> react-select
-   {:is-multi true,
-    :options (clj->js options),
-    :on-change (fn [xs]
-                 (swap! !state assoc
-                   :selection
-                   (->> (js->clj xs :keywordize-keys true)
-                        (map :label)
-                        (into #{}))))}])
-
-(defn result-ui []
-  [:div [:h3 "So you like"]
-   (let [selection (:selection @!state)]
-     (if (seq selection) [:div (pr-str selection)] "Nothing yet"))])
-
-;; START HERE
 (defonce drs-state
   (r/atom
    {:mode "drs>"
@@ -81,8 +59,8 @@
         heatmaps (r/cursor state [:current-output :heatmaps])]
       [:div
        [:div#plaintext (str (first (:plaintext output)))]
-       [draw/svg-heatmap-ui [100 0 700 600] heatmaps]
-       ;; [draw/svg-heatmap-test]
+       [draw/svg-heatmap-ui [0 0 600 600] heatmaps]
+       ;; [draw/svg-heatmap-test [100 0 700 600] heatmaps]
        [:div#heatmaps"hello, heatmaps"]
        ]))
 
